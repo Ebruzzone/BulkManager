@@ -5,16 +5,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-class BulkBuilder<T> implements RunnableKillable {
+class BulkBuilder<Obj, T> implements RunnableKillable {
 
 	private AtomicBoolean alive;
-	private BulkExecutor<T> executor;
-	private BulkManager<T> manager;
-	private ConcurrentLinkedQueue<BulkObject<T>> objects;
-	private LinkedList<BulkObject<T>> prepObjects;
+	private BulkExecutor<Obj, T> executor;
+	private BulkManager<Obj, T> manager;
+	private ConcurrentLinkedQueue<BulkObject<Obj, T>> objects;
+	private LinkedList<BulkObject<Obj, T>> prepObjects;
 	private AtomicLong size;
 
-	BulkBuilder(BulkManager<T> manager) {
+	BulkBuilder(BulkManager<Obj, T> manager) {
 		this.manager = manager;
 		this.executor = new BulkExecutor<>();
 
@@ -30,12 +30,12 @@ class BulkBuilder<T> implements RunnableKillable {
 		alive.set(false);
 		executor.kill();
 
-		synchronized (this){
+		synchronized (this) {
 			this.notify();
 		}
 	}
 
-	void add(BulkObject<T> object) {
+	void add(BulkObject<Obj, T> object) {
 		objects.add(object);
 	}
 
@@ -51,7 +51,7 @@ class BulkBuilder<T> implements RunnableKillable {
 			len = 0;
 
 			for (long i = 0; i < sizeTemp; i++) {
-				BulkObject<T> s = objects.poll();
+				BulkObject<Obj, T> s = objects.poll();
 				prepObjects.addLast(s);
 				len += s == null ? 0 : s.length();
 			}

@@ -1,6 +1,6 @@
 package Bulker;
 
-public abstract class BulkObject<T> {
+public abstract class BulkObject<Obj, T> {
 
 	protected T content;
 
@@ -8,7 +8,7 @@ public abstract class BulkObject<T> {
 		this.content = content;
 	}
 
-	public abstract BulkObject<T> union(BulkObject<T> other);
+	public abstract BulkObject<Obj, T> union(Obj other);
 
 	public abstract void exec();
 

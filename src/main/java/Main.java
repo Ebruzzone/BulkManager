@@ -11,7 +11,8 @@ public class Main {
 		System.setProperty("Log4jContextSelector", AsyncLoggerContextSelector.class.getName());
 		logger = (org.apache.logging.log4j.core.async.AsyncLogger) LogManager.getLogger();
 
-		BulkManager<StringBuilder> manager = new BulkManager<>(700L, 10000, 50000, 32);
+		BulkManager<LogExample, StringBuilder> manager =
+				new BulkManager<>(70L, 10000, 50000, 0, LogExample.class);
 
 		for (int i = 0; i < 10000000; i++) {
 			manager.add(new LogExample(new StringBuilder("ciao")));

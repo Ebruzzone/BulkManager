@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BulkManager<T> implements RunnableKillable {
+public class BulkManager<Obj, T> implements RunnableKillable {
 
 	private int wait;
 	private long maxWait;
 	private long maxSize;
 	private long last;
 	private final long maxFraction;
-	private final BulkBuilder<T> builder;
+	private final BulkBuilder<Obj, T> builder;
 	private AtomicBoolean alive;
 	private AtomicBoolean busy;
 	private AtomicLong lastSize;
@@ -19,11 +19,13 @@ public class BulkManager<T> implements RunnableKillable {
 	private AtomicLong waitBusy;
 	private AtomicLong size;
 	private AtomicLong actualFraction;
+	private Class<Obj> objClass;
 
-	public BulkManager(long maxWait, long initialBulkSize, long maxBulkSize, long maxFraction) {
+	public BulkManager(long maxWait, long initialBulkSize, long maxBulkSize, long maxFraction, Class<Obj> c) {
 		this.maxWait = maxWait;
 		this.maxFraction = maxFraction;
 		this.maxSize = maxBulkSize;
+		this.objClass = c;
 		this.size = new AtomicLong(initialBulkSize);
 		last = System.currentTimeMillis();
 
@@ -74,30 +76,30 @@ public class BulkManager<T> implements RunnableKillable {
 		}
 	}
 
-	BulkObject<T> union(LinkedList<BulkObject<T>> objects) {
+	BulkObject<Obj, T> union(LinkedList<BulkObject<Obj, T>> objects) {
 
-		BulkObject<T> objectFinal = objects.removeFirst();
+		BulkObject<Obj, T> objectFinal = objects.removeFirst();
 
 		long af = actualFraction.get();
 
 		if (af < 2) {
 
-			for (BulkObject<T> object : objects) {
+			for (BulkObject<Obj, T> object : objects) {
 
-				objectFinal = objectFinal.union(object);
+				objectFinal = objectFinal.union(objClass.cast(object));
 			}
 
 		} else {
 			long i = 0;
 
-			for (BulkObject<T> object : objects) {
+			for (BulkObject<Obj, T> object : objects) {
 				i++;
 
 				if (i % af != 0) {
 					continue;
 				}
 
-				objectFinal = objectFinal.union(object);
+				objectFinal = objectFinal.union(objClass.cast(object));
 			}
 		}
 
@@ -108,7 +110,7 @@ public class BulkManager<T> implements RunnableKillable {
 		return objectFinal;
 	}
 
-	public void add(BulkObject<T> object) {
+	public void add(BulkObject<Obj, T> object) {
 		if (!busy.get()) {
 			builder.add(object);
 		} else if (maxBusy.addAndGet(-object.length()) < 1) {
@@ -145,6 +147,7 @@ public class BulkManager<T> implements RunnableKillable {
 
 					if (maxFraction == 0) {
 						newSize *= factor;
+						newSize = Math.min(newSize, maxSize);
 					} else {
 						if (size.get() * factor * fraction * 1.2 > maxSize) {
 							fraction *= factor;

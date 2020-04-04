@@ -2,9 +2,9 @@ package Bulker;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class BulkExecutor<T> implements RunnableKillable {
+class BulkExecutor<Obj, T> implements RunnableKillable {
 
-	private BulkObject<T> object;
+	private BulkObject<Obj, T> object;
 	private AtomicBoolean alive;
 
 	BulkExecutor() {
@@ -19,7 +19,7 @@ class BulkExecutor<T> implements RunnableKillable {
 		}
 	}
 
-	synchronized void exec(BulkObject<T> object) {
+	synchronized void exec(BulkObject<Obj, T> object) {
 		this.object = object;
 		this.notify();
 	}

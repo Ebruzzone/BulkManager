@@ -1,15 +1,14 @@
 import Bulker.BulkObject;
 
-public class LogExample extends BulkObject<StringBuilder> {
+public class LogExample extends BulkObject<LogExample, StringBuilder> {
 
 	public LogExample(StringBuilder content) {
 		super(content);
 	}
 
-	public BulkObject<StringBuilder> union(BulkObject<StringBuilder> other) {
+	public BulkObject<LogExample, StringBuilder> union(LogExample other) {
 
-		LogExample o = (LogExample) other;
-		content.append(o.content).append("£");
+		content.append(other.content).append("£");
 		return this;
 	}
 

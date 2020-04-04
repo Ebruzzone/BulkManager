@@ -3,19 +3,17 @@ import Bulker.BulkObject;
 import kong.unirest.Unirest;
 import org.json.JSONArray;
 
-public class ApiPostExample extends BulkObject<JSONArray> {
+public class ApiPostExample extends BulkObject<ApiPostExample, JSONArray> {
 
 	public ApiPostExample(JSONArray content) {
 		super(content);
 	}
 
 	@Override
-	public BulkObject<JSONArray> union(BulkObject<JSONArray> other) {
-
-		ApiPostExample a = (ApiPostExample) other;
+	public BulkObject<ApiPostExample, JSONArray> union(ApiPostExample other) {
 
 		for (int i = 0; i < other.length(); i++) {
-			content.put(a.content.getJSONObject(i));
+			content.put(other.content.getJSONObject(i));
 		}
 
 		return this;
