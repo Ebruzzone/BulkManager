@@ -6,7 +6,7 @@ public class LogExample extends BulkObject<LogExample, StringBuilder> {
 		super(content);
 	}
 
-	public BulkObject<LogExample, StringBuilder> union(LogExample other) {
+	public BulkObject<LogExample, StringBuilder> join(LogExample other) {
 
 		content.append(other.content).append("£");
 		return this;

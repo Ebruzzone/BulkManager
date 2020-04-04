@@ -8,7 +8,7 @@ public abstract class BulkObject<Obj, T> {
 		this.content = content;
 	}
 
-	public abstract BulkObject<Obj, T> union(Obj other);
+	public abstract BulkObject<Obj, T> join(Obj other);
 
 	public abstract void exec();
 

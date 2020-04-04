@@ -86,7 +86,7 @@ public class BulkManager<Obj, T> implements RunnableKillable {
 
 			for (BulkObject<Obj, T> object : objects) {
 
-				objectFinal = objectFinal.union(objClass.cast(object));
+				objectFinal = objectFinal.join(objClass.cast(object));
 			}
 
 		} else {
@@ -99,7 +99,7 @@ public class BulkManager<Obj, T> implements RunnableKillable {
 					continue;
 				}
 
-				objectFinal = objectFinal.union(objClass.cast(object));
+				objectFinal = objectFinal.join(objClass.cast(object));
 			}
 		}
 
