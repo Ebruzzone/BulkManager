@@ -1,10 +1,10 @@
 package Bulker;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BulkManager<Obj, T> implements RunnableKillable {
+public class BulkManager<Obj extends BulkObject<Obj, T>, T> implements RunnableKillable {
 
 	private int wait;
 	private long maxWait;
@@ -19,13 +19,11 @@ public class BulkManager<Obj, T> implements RunnableKillable {
 	private AtomicLong waitBusy;
 	private AtomicLong size;
 	private AtomicLong actualFraction;
-	private Class<Obj> objClass;
 
-	public BulkManager(long maxWait, long initialBulkSize, long maxBulkSize, long maxFraction, Class<Obj> c) {
+	public BulkManager(long maxWait, long initialBulkSize, long maxBulkSize, long maxFraction) {
 		this.maxWait = maxWait;
 		this.maxFraction = maxFraction;
 		this.maxSize = maxBulkSize;
-		this.objClass = c;
 		this.size = new AtomicLong(initialBulkSize);
 		last = System.currentTimeMillis();
 
@@ -76,30 +74,30 @@ public class BulkManager<Obj, T> implements RunnableKillable {
 		}
 	}
 
-	BulkObject<Obj, T> union(LinkedList<BulkObject<Obj, T>> objects) {
+	Obj union(List<Obj> objects) {
 
-		BulkObject<Obj, T> objectFinal = objects.removeFirst();
+		Obj objectFinal = objects.remove(0);
 
 		long af = actualFraction.get();
 
 		if (af < 2) {
 
-			for (BulkObject<Obj, T> object : objects) {
+			for (Obj object : objects) {
 
-				objectFinal = objectFinal.join(objClass.cast(object));
+				objectFinal = objectFinal.join(object);
 			}
 
 		} else {
 			long i = 0;
 
-			for (BulkObject<Obj, T> object : objects) {
+			for (Obj object : objects) {
 				i++;
 
 				if (i % af != 0) {
 					continue;
 				}
 
-				objectFinal = objectFinal.join(objClass.cast(object));
+				objectFinal = objectFinal.join(object);
 			}
 		}
 
@@ -110,7 +108,7 @@ public class BulkManager<Obj, T> implements RunnableKillable {
 		return objectFinal;
 	}
 
-	public void add(BulkObject<Obj, T> object) {
+	public void add(Obj object) {
 		if (!busy.get()) {
 			builder.add(object);
 		} else if (maxBusy.addAndGet(-object.length()) < 1) {

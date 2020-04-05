@@ -1,6 +1,7 @@
 import Bulker.BulkManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector;
+import org.json.JSONArray;
 
 public class Main {
 
@@ -12,7 +13,7 @@ public class Main {
 		logger = (org.apache.logging.log4j.core.async.AsyncLogger) LogManager.getLogger();
 
 		BulkManager<LogExample, StringBuilder> manager =
-				new BulkManager<>(70L, 10000, 50000, 0, LogExample.class);
+				new BulkManager<>(70L, 10000, 50000, 0);
 
 		for (int i = 0; i < 10000000; i++) {
 			manager.add(new LogExample(new StringBuilder("ciao")));

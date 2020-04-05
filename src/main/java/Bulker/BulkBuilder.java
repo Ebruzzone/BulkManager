@@ -1,17 +1,18 @@
 package Bulker;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-class BulkBuilder<Obj, T> implements RunnableKillable {
+class BulkBuilder<Obj extends BulkObject<Obj, T>, T> implements RunnableKillable {
 
 	private AtomicBoolean alive;
 	private BulkExecutor<Obj, T> executor;
 	private BulkManager<Obj, T> manager;
-	private ConcurrentLinkedQueue<BulkObject<Obj, T>> objects;
-	private LinkedList<BulkObject<Obj, T>> prepObjects;
+	private ConcurrentLinkedQueue<Obj> objects;
+	private List<Obj> prepObjects;
 	private AtomicLong size;
 
 	BulkBuilder(BulkManager<Obj, T> manager) {
@@ -35,7 +36,7 @@ class BulkBuilder<Obj, T> implements RunnableKillable {
 		}
 	}
 
-	void add(BulkObject<Obj, T> object) {
+	void add(Obj object) {
 		objects.add(object);
 	}
 
@@ -51,8 +52,8 @@ class BulkBuilder<Obj, T> implements RunnableKillable {
 			len = 0;
 
 			for (long i = 0; i < sizeTemp; i++) {
-				BulkObject<Obj, T> s = objects.poll();
-				prepObjects.addLast(s);
+				Obj s = objects.poll();
+				prepObjects.add(prepObjects.size(), s);
 				len += s == null ? 0 : s.length();
 			}
 

@@ -10,7 +10,7 @@ public class ApiPostExample extends BulkObject<ApiPostExample, JSONArray> {
 	}
 
 	@Override
-	public BulkObject<ApiPostExample, JSONArray> join(ApiPostExample other) {
+	public ApiPostExample join(ApiPostExample other) {
 
 		for (int i = 0; i < other.length(); i++) {
 			content.put(other.content.getJSONObject(i));
